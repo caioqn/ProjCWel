@@ -21,7 +21,12 @@ namespace asdf_api.Controllers
         [HttpGet("{aniNome}")]
         public IEnumerable<string> Get(string aniNome, [FromServices] MySqlConnection connection)
         {
-            return connection.Query<string>("SELECT ani.ani_nome_usual FROM animais ani WHERE ani.ani_nome like '%@aniNome%'", new { aniNome }).ToArray();
+            return connection
+                .Query<string>(@"SELECT 
+                                        ani.ani_nome_usual 
+                                        FROM animais ani 
+                                        WHERE ani.ani_nome like '%@aniNome%'",
+                                        new { aniNome }).ToArray();
         }
 
         // POST api/<AnimalController>
