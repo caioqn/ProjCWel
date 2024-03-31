@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
+using asdf_api.DapperExtensions;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,35 +13,40 @@ namespace asdf_api.Controllers
     {
         // GET: api/<AnimalController>
         [HttpGet]
-        public IEnumerable<string> Get([FromServices] MySqlConnection connection)
+        public IEnumerable<dynamic> Get([FromServices] MySqlConnection connection)
         {
-            return connection.Query<string>("SELECT ani.ani_nome_usual FROM animais ani limit 100").ToArray();
+            var asdf = connection.Query(() => new
+            {
+                ani_nome = default(string),
+                ani_nome_usual = default(string)
+            },"SELECT ani.ani_nome,ani.ani_nome_usual FROM animais ani limit 10").ToArray();
+            return asdf;
         }
 
-        // GET api/<AnimalController>/NomeAnimal    
+        // GET api/<AnimalController>/ByName/NomeAnimal    
         [HttpGet("ByName/{aniNome}")]
         public IEnumerable<string> Get(string aniNome, [FromServices] MySqlConnection connection)
         {
-            var asdf = connection
+            var encodedSearch = $"%{aniNome}%";
+
+            return connection
                 .Query<string>(@"SELECT 
                                         ani.ani_nome_usual 
                                         FROM animais ani 
-                                        WHERE ani.ani_nome LIKE @%aniNome%",
-                                        new { aniNome });
-            return asdf.ToArray();
+                                        WHERE ani.ani_nome like @encodedSearch",
+                                        new { encodedSearch }).ToArray();
         }
-        
-        // GET api/<AnimalController>/aniData1&aniData2
+
+        // GET api/<AnimalController>/ByDate/aniData1&aniData2
         [HttpGet("ByDate/{aniData1}&{aniData2}")]
         public IEnumerable<string> Get(DateTime aniData1, DateTime aniData2, [FromServices] MySqlConnection connection)
         {
-         
             var asdf = connection
                 .Query<string>(@"SELECT 
-                                        ani_nome_usual
-                                        FROM animais ani
-                                        WHERE ani.ani_dt_nasc BETWEEN  @aniData1 AND @aniData2 limit 100",
-                                        new { aniData1,aniData2 });
+                                   ani_nome_usual
+                                   FROM animais ani
+                                   WHERE ani.ani_dt_nasc BETWEEN @aniData1 AND @aniData2",
+                                        new { aniData1, aniData2 });
             return asdf.ToArray();
         }
 
