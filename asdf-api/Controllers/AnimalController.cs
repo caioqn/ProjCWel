@@ -11,15 +11,16 @@ namespace asdf_api.Controllers
     [Route("[controller]")]
     public class AnimalController : ControllerBase
     {
-        // GET: api/<AnimalController>
-        [HttpGet]
+        // GET: api/<AnimalController>/GetLimited
+        [HttpGet("GetLimited")]
         public IEnumerable<dynamic> Get([FromServices] MySqlConnection connection)
         {
             var asdf = connection.Query(() => new
             {
                 ani_nome = default(string),
-                ani_nome_usual = default(string)
-            },"SELECT ani.ani_nome,ani.ani_nome_usual FROM animais ani limit 10").ToArray();
+                ani_nome_usual = default(string),
+                ani_ativo = default(string),
+            }, "SELECT ani.ani_nome,ani.ani_nome_usual,ani.ani_ativo FROM animais ani limit 10").ToArray();
             return asdf;
         }
 
