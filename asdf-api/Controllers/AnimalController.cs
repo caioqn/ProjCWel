@@ -18,16 +18,32 @@ namespace asdf_api.Controllers
         }
 
         // GET api/<AnimalController>/NomeAnimal    
-        [HttpGet("{aniNome}")]
+        [HttpGet("ByName/{aniNome}")]
         public IEnumerable<string> Get(string aniNome, [FromServices] MySqlConnection connection)
         {
-            return connection
+            var asdf = connection
                 .Query<string>(@"SELECT 
                                         ani.ani_nome_usual 
                                         FROM animais ani 
-                                        WHERE ani.ani_nome like '%@aniNome%'",
-                                        new { aniNome }).ToArray();
+                                        WHERE ani.ani_nome LIKE @%aniNome%",
+                                        new { aniNome });
+            return asdf.ToArray();
         }
+        
+        // GET api/<AnimalController>/aniData1&aniData2
+        [HttpGet("ByDate/{aniData1}&{aniData2}")]
+        public IEnumerable<string> Get(DateTime aniData1, DateTime aniData2, [FromServices] MySqlConnection connection)
+        {
+         
+            var asdf = connection
+                .Query<string>(@"SELECT 
+                                        ani_nome_usual
+                                        FROM animais ani
+                                        WHERE ani.ani_dt_nasc BETWEEN  @aniData1 AND @aniData2 limit 100",
+                                        new { aniData1,aniData2 });
+            return asdf.ToArray();
+        }
+
 
         // POST api/<AnimalController>
         [HttpPost]
@@ -36,7 +52,7 @@ namespace asdf_api.Controllers
         }
 
         // PUT api/<AnimalController>/5
-        [HttpPut("{id}")]
+        [HttpPut("{ id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
