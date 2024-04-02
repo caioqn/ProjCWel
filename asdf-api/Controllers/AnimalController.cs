@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 using asdf_api.DapperExtensions;
+using asdf_api.Entities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -26,13 +27,13 @@ namespace asdf_api.Controllers
 
         // GET api/<AnimalController>/ByName/NomeAnimal    
         [HttpGet("ByName/{aniNome}")]
-        public IEnumerable<string> Get(string aniNome, [FromServices] MySqlConnection connection)
+        public IEnumerable<Animal> Get(string aniNome, [FromServices] MySqlConnection connection)
         {
             var encodedSearch = $"%{aniNome}%";
 
             return connection
-                .Query<string>(@"SELECT 
-                                        ani.ani_nome_usual 
+                .Query<Animal>(@"SELECT 
+                                        ani.ani_pk,ani.ani_nome,ani.ani_nome_usual,ani.ani_dt_nasc, ani.ani_ativo
                                         FROM animais ani 
                                         WHERE ani.ani_nome like @encodedSearch",
                                         new { encodedSearch }).ToArray();
@@ -40,15 +41,15 @@ namespace asdf_api.Controllers
 
         // GET api/<AnimalController>/ByDate/aniData1&aniData2
         [HttpGet("ByDate/{aniData1}&{aniData2}")]
-        public IEnumerable<string> Get(DateTime aniData1, DateTime aniData2, [FromServices] MySqlConnection connection)
+        public IEnumerable<string?> Get(DateTime aniData1, DateTime aniData2, [FromServices] MySqlConnection connection)
         {
             var asdf = connection
-                .Query<string>(@"SELECT 
+                .Query<Animal>(@"SELECT 
                                    ani_nome_usual
                                    FROM animais ani
                                    WHERE ani.ani_dt_nasc BETWEEN @aniData1 AND @aniData2",
                                         new { aniData1, aniData2 });
-            return asdf.ToArray();
+            return asdf.Select(x => x.ani_nome_usual).ToArray();
         }
 
 
