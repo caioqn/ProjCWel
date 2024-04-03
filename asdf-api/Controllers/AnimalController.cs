@@ -52,6 +52,20 @@ namespace asdf_api.Controllers
             return asdf.Select(x => x.ani_nome_usual).ToArray();
         }
 
+        // GET api/<AnimalController>/ByPk/ComMorte
+        [HttpGet("ByPk/{mortePK}")]
+        public IEnumerable<ComMorte> Get(int mortePK, [FromServices] MySqlConnection connection)
+        {
+            var encodedSearch = $"%{mortePK}%";
+
+            return connection
+                .Query<ComMorte>(@"SELECT 
+                                        cma.com_morte_ani_pk, cma.com_morte_ani_nome, cma.com_morte_ani_causa_morte
+                                        FROM com_morte_ani cma
+                                        WHERE cma.com_morte_ani_pk like @encodedSearch",
+                                        new { encodedSearch }).ToArray();
+        }
+
 
         // POST api/<AnimalController>
         [HttpPost]
