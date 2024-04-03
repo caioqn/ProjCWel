@@ -12,13 +12,7 @@ namespace asdf_api.Controllers
     [ApiController]
     public class ComMorteController : ControllerBase
     {
-        // GET: api/<ComMorteController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
+        // GET api/<ComMorteController>/GetLimited
         [HttpGet("GetLimited")]
         public IEnumerable<dynamic> Get([FromServices] MySqlConnection connection)
         {
@@ -33,7 +27,7 @@ namespace asdf_api.Controllers
                             FROM com_morte_ani cma limit 10").ToArray();
             return asdf;
         }
-
+        // GET api/<ComMorteController>/ByDate/aniData1&aniData2
         [HttpGet("ByDate/{aniData1}&{aniData2}")]
         public IEnumerable<string?> Get(DateTime aniData1, DateTime aniData2, [FromServices] MySqlConnection connection)
         {
@@ -46,7 +40,7 @@ namespace asdf_api.Controllers
             return asdf.Select(x => x.com_morte_ani_nome).ToArray();
         }
 
-        // GET api/<AnimalController>/ByPk/ComMorte
+        // GET api/<ComMorteController>/ByName/ComMorteAniNome
         [HttpGet("ByName/{comMorteAniNome}")]
         public IEnumerable<ComMorte> Get(string comMorteAniNome, [FromServices] MySqlConnection connection)
         {
@@ -67,14 +61,6 @@ namespace asdf_api.Controllers
                                         FROM com_morte_ani cma
                                         WHERE cma.com_morte_ani_nome like @encodedSearch",
                                         new { encodedSearch }).ToArray();
-        }
-
-
-        // GET api/<ComMorteController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
         }
 
         // POST api/<ComMorteController>
