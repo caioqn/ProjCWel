@@ -396,3 +396,6 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# specific config files for each development machine, aka appsettings.Development.json
+asdf-api/appsettings.Development.json
