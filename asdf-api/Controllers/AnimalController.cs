@@ -12,47 +12,65 @@ namespace asdf_api.Controllers
     [Route("[controller]")]
     public class AnimalController : ControllerBase
     {
+        private readonly MySqlConnection _context;
+
+        public AnimalController([FromServices] MySqlConnection connection)
+        {
+            _context = connection;
+        }
+
         // GET: api/<AnimalController>/GetLimited
         [HttpGet("GetLimited")]
-        public IEnumerable<dynamic> Get([FromServices] MySqlConnection connection)
+        public async Task<ActionResult<IEnumerable<dynamic>>> Get()
         {
-            var asdf = connection.Query(() => new
+            const string SQL = @"SELECT ani.ani_nome,ani.ani_nome_usual,ani.ani_ativo FROM animais ani limit 10";
+
+            var animais = await _context.QueryAsync(() => new
             {
                 ani_nome = default(string),
                 ani_nome_usual = default(string),
                 ani_ativo = default(string),
-            }, "SELECT ani.ani_nome,ani.ani_nome_usual,ani.ani_ativo FROM animais ani limit 10").ToArray();
-            return asdf;
+            }, SQL);
+
+            if (animais == null || !animais.Any()) return NotFound();
+
+            return Ok(animais);
         }
 
         // GET api/<AnimalController>/ByName/NomeAnimal    
         [HttpGet("ByName/{aniNome}")]
-        public IEnumerable<Animal> Get(string aniNome, [FromServices] MySqlConnection connection)
+        public async Task<ActionResult<IEnumerable<Animal>>> Get(string aniNome)
         {
-            var encodedSearch = $"%{aniNome}%";
-
-            return connection
-                .Query<Animal>(@"SELECT 
+            const string SQL = @"SELECT 
                                         ani.ani_pk,ani.ani_nome,ani.ani_nome_usual,ani.ani_dt_nasc, ani.ani_ativo
                                         FROM animais ani 
-                                        WHERE ani.ani_nome like @encodedSearch",
-                                        new { encodedSearch }).ToArray();
+                                        WHERE ani.ani_nome like @encodedSearch";
+            var encodedSearch = $"%{aniNome}%";
+
+            var animais = await _context.QueryAsync<Animal>(SQL, new { encodedSearch });
+
+            if (animais == null || !animais.Any()) return NotFound();
+
+            return Ok(animais);
         }
 
         // GET api/<AnimalController>/ByDate/aniData1&aniData2
         [HttpGet("ByDate/{aniData1}&{aniData2}")]
-        public IEnumerable<string?> Get(DateTime aniData1, DateTime aniData2, [FromServices] MySqlConnection connection)
+        public ActionResult<IEnumerable<string?>> Get(DateTime aniData1, DateTime aniData2)
         {
-            var asdf = connection
-                .Query<Animal>(@"SELECT 
+            const string SQL = @"SELECT 
                                    ani_nome_usual
                                    FROM animais ani
-                                   WHERE ani.ani_dt_nasc BETWEEN @aniData1 AND @aniData2",
-                                        new { aniData1, aniData2 });
-            return asdf.Select(x => x.ani_nome_usual).ToArray();
+                                   WHERE ani.ani_dt_nasc BETWEEN @aniData1 AND @aniData2";
+
+            var animais = _context.Query<Animal>(SQL,new { aniData1, aniData2 });
+
+            if (animais == null || !animais.Any()) return NotFound();
+
+            return Ok(animais.Select(x => x.ani_nome_usual));
         }
 
-        
+
         // POST api/<AnimalController>
         [HttpPost]
         public void Post([FromBody] string value)

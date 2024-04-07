@@ -8,7 +8,7 @@ using asdf_api.Entities;
 
 namespace asdf_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ComMorteController : ControllerBase
     {
