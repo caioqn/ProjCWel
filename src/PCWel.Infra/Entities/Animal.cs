@@ -1,4 +1,4 @@
-﻿namespace asdf_api.Entities
+﻿namespace PCWel.Infra.Entities
 {
     public class Animal 
     {

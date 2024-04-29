@@ -1,8 +1,8 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
-using asdf_api.DapperExtensions;
-using asdf_api.Entities;
+using PCWel.Infra.DapperExtensions;
+using PCWel.Infra.Entities;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

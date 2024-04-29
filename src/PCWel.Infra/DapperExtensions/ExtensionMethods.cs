@@ -1,7 +1,7 @@
 ﻿using Dapper;
 using System.Data;
 
-namespace asdf_api.DapperExtensions
+namespace PCWel.Infra.DapperExtensions
 {
     public static class ExtensionMethods
     {
